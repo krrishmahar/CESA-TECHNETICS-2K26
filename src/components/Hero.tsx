@@ -1,72 +1,99 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 
+// Import the video asset directly to ensure Vite handles the path correctly
+import heroVideo from '../assets/hero.mp4'; 
+
+const TARGET_DATE = new Date("2026-03-17T00:00:00").getTime();
+
 const Hero = () => {
-  // Simple Countdown Logic
-  const [timeLeft, setTimeLeft] = useState({ days: 105, hours: 3, minutes: 27, seconds: 6 });
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Logic to calculate the time remaining until the event start date
+  const calculateTimeLeft = () => {
+    const now = new Date().getTime();
+    const difference = TARGET_DATE - now;
+
+    if (difference > 0) {
+      return {
+        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((difference / 1000 / 60) % 60),
+        seconds: Math.floor((difference / 1000) % 60)
+      };
+    }
+    return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+  };
+
+  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
 
   useEffect(() => {
+    // Update the countdown timer every 1 second
     const timer = setInterval(() => {
-      setTimeLeft(prev => {
-        let { days, hours, minutes, seconds } = prev;
-        if (seconds > 0) seconds--;
-        else { seconds = 59; if (minutes > 0) minutes--; else { minutes = 59; if (hours > 0) hours--; else { hours = 23; days--; } } }
-        return { days, hours, minutes, seconds };
-      });
+      setTimeLeft(calculateTimeLeft());
     }, 1000);
+
+    // Explicitly trigger play to handle potential browser autoplay restrictions
+    if (videoRef.current) {
+      videoRef.current.play().catch(err => console.error("Playback failed:", err));
+    }
+
     return () => clearInterval(timer);
   }, []);
 
   return (
     <div className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden pt-20">
-      {/* Background Image */}
-      <div className="absolute inset-0 z-0">
-        <img src="/hogwarts-bg.svg" alt="Background" className="w-full h-full object-cover opacity-60 mix-blend-overlay" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#021516]/80 via-[#021516]/60 to-[#021516]"></div>
+      
+      {/* Background Video Section */}
+      <div className="absolute inset-0 z-0 bg-black">
+        <video 
+          ref={videoRef}
+          src={heroVideo}
+          autoPlay 
+          loop 
+          muted 
+          playsInline 
+          preload="auto"
+          // Removed mix-blend-overlay and adjusted opacity for better visibility
+          className="w-full h-full object-cover opacity-70"
+        />
+        {/* Dark Gradient Overlay to ensure text readability */}
+        <div className="absolute inset-0 z-20 bg-gradient-to-b from-[#021516]/80 via-[#021516]/40 to-[#021516]"></div>
       </div>
 
-      <div className="relative z-10 text-center px-4 flex flex-col items-center">
-        {/* Main Title */}
-        <motion.h1
+      <div className="relative z-30 text-center px-4 flex flex-col items-center">
+        {/* Main Event Title */}
+        <motion.h1 
           initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 1 }}
-          className="text-6xl md:text-8xl font-black text-[#d4af37] mb-2 drop-shadow-[0_0_15px_rgba(212,175,55,0.4)]"
+          className="text-6xl md:text-8xl font-black text-[#d4af37] mb-2 drop-shadow-[0_0_20px_rgba(212,175,55,0.5)]"
           style={{ fontFamily: "'Cinzel', serif" }}
         >
           TECHNETICS 2K26
         </motion.h1>
-
-        <motion.p
+        
+        <motion.p 
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 1, delay: 0.2 }}
-          className="text-2xl md:text-3xl text-teal-100 font-semibold mb-6"
+          className="text-2xl md:text-3xl text-teal-100 font-semibold mb-6 drop-shadow-lg"
           style={{ fontFamily: "'Cinzel', serif" }}
         >
           Where Code Meets Magic.
         </motion.p>
 
-        <motion.p
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, delay: 0.4 }}
-          className="text-sm md:text-base text-gray-300 mb-12 max-w-3xl"
-        >
-          April 17-19, 2026 • Vasantdada Patil Pratishthan's College of Engineering & Visual Arts, Sion
-        </motion.p>
-
-        {/* Countdown Timer */}
-        <motion.div
+        {/* Professional Countdown Timer Display */}
+        <motion.div 
           initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.8, delay: 0.6 }}
-          className="flex items-center gap-4 md:gap-8"
+          className="flex items-center gap-3 md:gap-6 mt-8"
         >
           {Object.entries(timeLeft).map(([unit, value]) => (
-            <div key={unit} className="flex flex-col items-center">
-              <div className="w-20 h-24 md:w-28 md:h-32 bg-[#fffdf5] rounded-md flex items-center justify-center shadow-[0_0_20px_rgba(212,175,55,0.2)] border border-[#d4af37]/50 relative">
-                {/* Vintage Corner Accents */}
-                <div className="absolute top-1 left-1 w-2 h-2 border-t border-l border-[#d4af37]"></div>
-                <div className="absolute top-1 right-1 w-2 h-2 border-t border-r border-[#d4af37]"></div>
-                <div className="absolute bottom-1 left-1 w-2 h-2 border-b border-l border-[#d4af37]"></div>
-                <div className="absolute bottom-1 right-1 w-2 h-2 border-b border-r border-[#d4af37]"></div>
-
-                <span className="text-4xl md:text-5xl font-bold text-black">{String(value).padStart(2, '0')}</span>
+            <div key={unit} className="flex flex-col items-center group">
+              <div className="relative w-24 h-28 md:w-32 md:h-36 rounded-xl flex items-center justify-center overflow-hidden border border-[#d4af37]/30 bg-[#021516]/60 backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.6)] group-hover:border-[#d4af37]/80 group-hover:shadow-[0_0_40px_rgba(212,175,55,0.3)] transition-all duration-500">
+                <span className="relative text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-[#fef08a] via-[#d4af37] to-[#b45309] drop-shadow-xl" style={{ fontFamily: "'Inter', sans-serif" }}>
+                  {String(value).padStart(2, '0')}
+                </span>
               </div>
-              <span className="text-[#d4af37] mt-3 font-serif capitalize tracking-widest">{unit}</span>
+              <span className="text-teal-200 mt-4 font-bold text-sm md:text-base uppercase tracking-[0.2em] group-hover:text-[#d4af37] transition-colors">
+                {unit}
+              </span>
             </div>
           ))}
         </motion.div>
