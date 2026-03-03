@@ -1,35 +1,21 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// src/App.tsx
+import Navbar from './components/Navbar';
+import Hero from './components/Hero';
+import Events from './components/Events';
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    // Dark base background rakhte hain fallback ke liye
+    <div className="bg-[#050505] min-h-screen text-white font-sans">
+      <Navbar />
+      <Hero />
+      <Events />
+      {/* Abhi yahan niche ke sections aayenge */}
+      <div className="h-screen bg-black flex items-center justify-center">
+         <h2 className="text-4xl text-gray-500">Scroll karke dekh, Events yahan aayenge...</h2>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </div>
+  );
 }
 
-export default App
+export default App;
