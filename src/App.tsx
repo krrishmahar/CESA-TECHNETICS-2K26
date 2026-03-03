@@ -1,19 +1,17 @@
-// src/App.tsx
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Events from './components/Events';
+import InfoSections from './components/InfoSections';
+import Footer from './components/Footer';
 
 function App() {
   return (
-    // Dark base background rakhte hain fallback ke liye
-    <div className="bg-[#050505] min-h-screen text-white font-sans">
+    <div className="bg-[#021516] min-h-screen text-white font-sans selection:bg-[#d4af37] selection:text-black">
       <Navbar />
       <Hero />
       <Events />
-      {/* Abhi yahan niche ke sections aayenge */}
-      <div className="h-screen bg-black flex items-center justify-center">
-         <h2 className="text-4xl text-gray-500">Scroll karke dekh, Events yahan aayenge...</h2>
-      </div>
+      <InfoSections />
+      <Footer />
     </div>
   );
 }
