@@ -8,11 +8,11 @@ const FootprintSVG = ({ mirrored = false, color = '#5c3a10' }: { mirrored?: bool
     xmlns="http://www.w3.org/2000/svg"
     style={{ transform: mirrored ? 'scaleX(-1)' : 'none' }}
   >
-    <ellipse cx="9" cy="20" rx="5.5" ry="5"   fill={color} opacity="0.85" />
-    <ellipse cx="9" cy="11" rx="4.5" ry="5"   fill={color} opacity="0.85" />
-    <ellipse cx="5"  cy="4" rx="2.2" ry="2.8" fill={color} opacity="0.75" />
-    <ellipse cx="8"  cy="2" rx="2"   ry="2.5" fill={color} opacity="0.75" />
-    <ellipse cx="11" cy="2" rx="2"   ry="2.5" fill={color} opacity="0.75" />
+    <ellipse cx="9" cy="20" rx="5.5" ry="5" fill={color} opacity="0.85" />
+    <ellipse cx="9" cy="11" rx="4.5" ry="5" fill={color} opacity="0.85" />
+    <ellipse cx="5" cy="4" rx="2.2" ry="2.8" fill={color} opacity="0.75" />
+    <ellipse cx="8" cy="2" rx="2" ry="2.5" fill={color} opacity="0.75" />
+    <ellipse cx="11" cy="2" rx="2" ry="2.5" fill={color} opacity="0.75" />
     <ellipse cx="14" cy="4" rx="1.8" ry="2.3" fill={color} opacity="0.65" />
   </svg>
 );
@@ -26,7 +26,7 @@ interface Footprint {
   isRight: boolean;
 }
 
-const WalkingFootprints = ({ containerRef }: { containerRef: React.RefObject<HTMLElement> }) => {
+const WalkingFootprints = () => {
   const [prints, setPrints] = useState<Footprint[]>([]);
   const counterRef = useRef(0);
   const posRef = useRef({ x: 10, y: 50 });
@@ -84,7 +84,7 @@ const WalkingFootprints = ({ containerRef }: { containerRef: React.RefObject<HTM
             className="absolute"
             style={{
               left: `${print.x}%`,
-              top:  `${print.y}%`,
+              top: `${print.y}%`,
               rotate: print.angle,
               translateX: '-50%',
               translateY: '-50%',
@@ -140,7 +140,7 @@ const Footer = () => {
 
       {/* Walking footprints */}
       <div className="absolute inset-0 z-20 pointer-events-none">
-        <WalkingFootprints containerRef={footerRef as React.RefObject<HTMLElement>} />
+        <WalkingFootprints />
       </div>
 
       {/* Content — sits above everything */}

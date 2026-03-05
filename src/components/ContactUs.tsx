@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // ── HP CHARACTER IMAGE AVATARS ────────────────────────────────────────────────
-const HarryAvatar    = () => <img src="/character/harry.png"     alt="Harry"     className="w-full h-full object-contain" />;
-const HermioneAvatar = () => <img src="/character/hermione.png"  alt="Hermione"  className="w-full h-full object-contain" />;
-const RonAvatar      = () => <img src="/character/ron.png"       alt="Ron"       className="w-full h-full object-contain" />;
-const SnappeAvatar   = () => <img src="/character/snape.png"     alt="Snape"     className="w-full h-full object-contain" />;
+const HarryAvatar = () => <img src="/character/harry.png" alt="Harry" className="w-full h-full object-contain" />;
+const HermioneAvatar = () => <img src="/character/hermione.png" alt="Hermione" className="w-full h-full object-contain" />;
+const RonAvatar = () => <img src="/character/ron.png" alt="Ron" className="w-full h-full object-contain" />;
+const SnappeAvatar = () => <img src="/character/snape.png" alt="Snape" className="w-full h-full object-contain" />;
 const DumbledoreAvatar = () => <img src="/character/dumbledore.png" alt="Dumbledore" className="w-full h-full object-contain" />;
-const HagridAvatar   = () => <img src="/character/hagrid.png"    alt="Hagrid"    className="w-full h-full object-contain" />;
+const HagridAvatar = () => <img src="/character/hagrid.png" alt="Hagrid" className="w-full h-full object-contain" />;
 
 const faqs = [
   {
@@ -212,6 +212,7 @@ const ContactForm = () => {
       </div>
 
       <button
+        onClick={handleSubmit}
         disabled
         title="Backend integration coming soon!"
         className="flex items-center gap-2 px-7 py-3 bg-[#d4af37]/50 text-[#021516] text-sm font-black uppercase tracking-widest rounded-xl cursor-not-allowed opacity-60 select-none"
