@@ -256,6 +256,47 @@ const Footer = () => {
           <p style={{ fontFamily: "'Georgia', serif" }}>
             © 2026 TECHNETICS · CESA × CSI · All rights reserved.
           </p>
+
+          {/* Developer watermark */}
+          <p
+            style={{
+              fontFamily: "'Georgia', serif",
+              color: 'rgba(122,79,31,0.55)',
+              fontSize: '0.68rem',
+              letterSpacing: '0.04em',
+              userSelect: 'none',
+            }}
+          >
+            Developed by{' '}
+            <a
+              href="https://github.com/bhuvaneshrn"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                color: 'rgba(122,79,31,0.7)',
+                textDecoration: 'none',
+                borderBottom: '1px dotted rgba(212,175,55,0.35)',
+                paddingBottom: '1px',
+                transition: 'color 0.25s ease, text-shadow 0.25s ease, border-color 0.25s ease',
+                cursor: 'pointer',
+              }}
+              onMouseEnter={e => {
+                const el = e.currentTarget;
+                el.style.color = '#d4af37';
+                el.style.textShadow = '0 0 8px rgba(212,175,55,0.5)';
+                el.style.borderBottomColor = '#d4af37';
+              }}
+              onMouseLeave={e => {
+                const el = e.currentTarget;
+                el.style.color = 'rgba(122,79,31,0.7)';
+                el.style.textShadow = 'none';
+                el.style.borderBottomColor = 'rgba(212,175,55,0.35)';
+              }}
+            >
+              Bhuvi
+            </a>
+          </p>
+
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110"
