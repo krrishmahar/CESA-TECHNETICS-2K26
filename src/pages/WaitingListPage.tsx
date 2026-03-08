@@ -7,7 +7,7 @@ const WaitingListPage = () => {
   return (
     <div className="min-h-screen bg-[#021516] flex flex-col items-center justify-center text-[#d4af37] p-4 relative overflow-hidden">
       {/* Magical background sparkles */}
-      <div className="absolute inset-0 bg-[url('/sparkles.png')] opacity-10 mix-blend-screen pointer-events-none"></div>
+      <div className="absolute inset-0 opacity-10 mix-blend-screen pointer-events-none"></div>
 
       <motion.div 
         initial={{ opacity: 0, scale: 0.9, y: 20 }}

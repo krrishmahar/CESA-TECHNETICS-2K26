@@ -3,8 +3,8 @@ import { motion } from 'framer-motion';
 import React from 'react';
 
 // Import the video asset directly to ensure Vite handles the path correctly
-import heroVideo from '../assets/video/optimized_hero.webm'; 
-import heroVideoMobile from '../assets/video/optimized_hero_mobile.webm'; 
+import heroVideo from '/video/optimized_hero.webm'; 
+import heroVideoMobile from '/video/optimized_hero_mobile.webm'; 
 
 const TARGET_DATE = new Date("2026-03-16T00:00:00").getTime();
 

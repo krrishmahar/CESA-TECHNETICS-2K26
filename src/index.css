@@ -24,12 +24,12 @@ body {
 
 @font-face {
   font-family: "blackchancery";
-  src: url("/src/assets/fonts/BLKCHCRY.TTF") format("truetype");
+  src: url("/fonts/BLKCHCRY.TTF") format("truetype");
 }
 
 @font-face {
   font-family: "harryP";
-  src: url("/src/assets/fonts/harryP.ttf") format("truetype");
+  src: url("/fonts/harryP.ttf") format("truetype");
 }
 
 ::selection {
