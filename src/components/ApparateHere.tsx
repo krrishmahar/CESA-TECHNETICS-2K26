@@ -51,7 +51,7 @@ const MaraudersMapOverlay = () => {
         }}
       >
         <img
-          src="/h.jpg" alt="Hogwarts Castle"
+          src="/hogwarts.jpg" alt="Hogwarts Castle"
           className="w-48 h-32 object-cover rounded-xl border-2 border-[#d4af37]/40 shadow-[0_0_20px_rgba(101,63,15,0.6)]"
           style={{ filter: 'sepia(20%) contrast(110%)' }}
         />

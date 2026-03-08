@@ -104,7 +104,7 @@ const InfoSections = () => {
             <div className="text-center z-10 transition-transform group-hover:scale-110 duration-500">
 
               <img
-                src="src/assets/Discord.png"
+                src="/Discord.png"
                 alt="Wizard Discord Logo"
                 className="w-40 md:w-56 mx-auto mb-4 drop-shadow-[0_0_25px_rgba(239,210,144,0.6)]"
               />
