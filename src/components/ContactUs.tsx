@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import emailjs from '@emailjs/browser';
 
 // ── HP CHARACTER IMAGE AVATARS ────────────────────────────────────────────────
 const HarryAvatar = () => <img src="/character/harry.png" alt="Harry" className="w-full h-full object-contain" />;
@@ -141,19 +142,34 @@ const FAQCard = ({ faq, index }: { faq: typeof faqs[0]; index: number }) => {
 const ContactForm = () => {
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
- 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (form.name && form.email && form.subject && form.message) {
-      const to = 'technetics2k26@gmail.com'; // 👈 replace with your Gmail
-      const subject = encodeURIComponent(`[Technetics Ticket] ${form.subject}`);
-      const body = encodeURIComponent(
-        `Name: ${form.name}\nEmail: ${form.email}\n\n${form.message}`
-      );
-      window.open(`mailto:${to}?subject=${subject}&body=${body}`, '_blank');
-      setSubmitted(true);
-      setTimeout(() => setSubmitted(false), 4000);
-      setForm({ name: '', email: '', subject: '', message: '' });
+      setLoading(true);
+      try {        
+        await emailjs.send(
+          import.meta.env.VITE_EMAILJS_SERVICE_ID,
+          import.meta.env.VITE_EMAILJS_ADMIN_TEMPLATE_ID,
+          {
+            from_name: form.name,
+            to_name: 'Technetics Team',
+            from_email: form.email,
+            reply_to: form.email,
+            subject: `${form.subject}`,
+            message: form.message,
+          },
+          import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+        );
+        setSubmitted(true);
+        setTimeout(() => setSubmitted(false), 4000);
+        setForm({ name: '', email: '', subject: '', message: '' });
+      } catch (error) {
+        console.error('Failed to send ticket:', error);
+        alert('Failed to dispatch owl. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -214,11 +230,11 @@ const ContactForm = () => {
 
       <button
         onClick={handleSubmit}
-        disabled
-        title="Backend integration coming soon!"
-        className="flex items-center gap-2 px-7 py-3 bg-[#d4af37]/50 text-[#021516] text-sm font-black uppercase tracking-widest rounded-xl cursor-not-allowed opacity-60 select-none"
+        disabled={loading}
+        title="Send your query via owl"
+        className={`flex items-center gap-2 px-7 py-3 bg-[#d4af37]/50 text-[#021516] text-sm font-black uppercase tracking-widest rounded-xl transition-colors ${loading ? 'opacity-60 cursor-not-allowed select-none' : 'hover:bg-[#d4af37]/80 cursor-pointer'}`}
       >
-        <span>🪄</span> Send Owl
+        <span>🪄</span> {loading ? 'Sending...' : 'Send Owl'}
       </button>
 
       <AnimatePresence>
