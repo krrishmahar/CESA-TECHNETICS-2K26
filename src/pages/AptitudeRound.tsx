@@ -61,7 +61,12 @@ const AptitudeRound = () => {
 
     // --- STRANGER TECH LOGIC: PERSISTENT TIMER ---
     const [timeLeft, setTimeLeft] = useState(() => {
-        const duration = 20 * 60; // 20 minutes
+        const savedEndTime = localStorage.getItem('aptitude_end_time');
+        if (savedEndTime) {
+            const remaining = Math.max(0, Math.floor((parseInt(savedEndTime) - Date.now()) / 1000));
+            return remaining;
+        }
+        const duration = 60 * 60; // 1 hour
         const newEndTime = Date.now() + duration * 1000;
         localStorage.setItem('aptitude_end_time', newEndTime.toString());
         return duration;
@@ -119,7 +124,7 @@ const AptitudeRound = () => {
             localStorage.removeItem('aptitude_answers');
             localStorage.removeItem('aptitude_flagged');
             localStorage.removeItem('aptitude_switches');
-            navigate('/github-round');
+            navigate('/waiting-list?next=/github-round');
             setIsSubmitting(false);
         }, 1500);
     };

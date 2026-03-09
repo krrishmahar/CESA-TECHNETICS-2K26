@@ -8,8 +8,6 @@ import {
     Wifi,
     ShieldCheck,
     AlertCircle,
-    Brain,
-    Github,
     Code,
     MonitorCheck
 } from 'lucide-react';
@@ -24,6 +22,11 @@ const HackathonSelection = () => {
 
     // --- STRANGER TECH LOGIC: PERSISTENT TIMER ---
     const [timeLeft, setTimeLeft] = useState(() => {
+        const savedEndTime = localStorage.getItem('hackathon_selection_end_time');
+        if (savedEndTime) {
+            const remaining = Math.max(0, Math.floor((parseInt(savedEndTime) - Date.now()) / 1000));
+            return remaining;
+        }
         const duration = 60 * 60; // 1 hour for decision
         const newEndTime = Date.now() + duration * 1000;
         localStorage.setItem('hackathon_selection_end_time', newEndTime.toString());
@@ -34,26 +37,22 @@ const HackathonSelection = () => {
         {
             id: 1,
             title: "The Arithmancy Algorithm",
-            description: "Build a high-performance predictive engine to calculate variance in magical outcomes using recursive spell-casting patterns.",
-            difficulty: "Advanced"
+            description: "Build a high-performance predictive engine to calculate variance in magical outcomes using recursive spell-casting patterns."
         },
         {
             id: 2,
             title: "The Marauder's Map API",
-            description: "Develop a real-time tracking system for mythical entities within a sanctuary, implementing complex geolocation and obfuscation logic.",
-            difficulty: "Hard"
+            description: "Develop a real-time tracking system for mythical entities within a sanctuary, implementing complex geolocation and obfuscation logic."
         },
         {
             id: 3,
             title: "The Patronus Protocol",
-            description: "Implement a secure, encrypted messaging framework using ethereal light signatures and decentralized trust nodes.",
-            difficulty: "Elite"
+            description: "Implement a secure, encrypted messaging framework using ethereal light signatures and decentralized trust nodes."
         },
         {
             id: 4,
             title: "The Triwizard Tracker",
-            description: "Create a tamper-proof distributed ledger system for tournament scoring, ensuring integrity across multiple magical venues.",
-            difficulty: "Master"
+            description: "Create a tamper-proof distributed ledger system for tournament scoring, ensuring integrity across multiple magical venues."
         }
     ];
 
@@ -207,20 +206,16 @@ const HackathonSelection = () => {
                                         : 'border-[#d4af37]/20 hover:border-[#d4af37]/40'
                                         }`}
                                 >
-                                    <div className="flex items-center gap-3 mb-3">
+                                    <div className="flex items-center gap-3 mb-4">
                                         <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold border ${selectedId === prob.id ? 'bg-[#FFD700] text-black border-[#FFD700]' : 'bg-[#d4af37]/10 text-[#d4af37] border-[#d4af37]/20'
                                             }`}>
                                             0{prob.id}
                                         </div>
-                                        <span className={`text-[10px] font-black uppercase tracking-widest ${selectedId === prob.id ? 'text-[#FFD700]' : 'text-gray-500'
-                                            }`}>
-                                            {prob.difficulty}
-                                        </span>
+                                        <h3 className="text-xl font-wizard text-white leading-tight group-hover:text-[#FFD700] transition-colors pt-1">
+                                            {prob.title}
+                                        </h3>
                                     </div>
-                                    <h3 className="text-xl font-wizard text-white mb-2 leading-tight group-hover:text-[#FFD700] transition-colors">
-                                        {prob.title}
-                                    </h3>
-                                    <p className="text-xs text-gray-400 leading-relaxed font-sans">
+                                    <p className="text-xs text-gray-400 leading-relaxed font-sans mb-2">
                                         {prob.description}
                                     </p>
 
@@ -361,7 +356,6 @@ const HackathonSelection = () => {
                             <ul className="space-y-3">
                                 {[
                                     "Review each problem statement carefully",
-                                    "Consider complexity and difficulty",
                                     "Once selected, the choice is permanent",
                                     "Hackathon environment launches next"
                                 ].map((step, i) => (

@@ -24,6 +24,11 @@ const GithubRound = () => {
 
     // --- STRANGER TECH LOGIC: PERSISTENT TIMER ---
     const [timeLeft, setTimeLeft] = useState(() => {
+        const savedEndTime = localStorage.getItem('github_end_time');
+        if (savedEndTime) {
+            const remaining = Math.max(0, Math.floor((parseInt(savedEndTime) - Date.now()) / 1000));
+            return remaining;
+        }
         const duration = 60 * 60; // 60 minutes
         const newEndTime = Date.now() + duration * 1000;
         localStorage.setItem('github_end_time', newEndTime.toString());
@@ -61,7 +66,7 @@ const GithubRound = () => {
             localStorage.removeItem('github_submission_link');
             localStorage.removeItem('github_switches');
             localStorage.removeItem('github_frozen');
-            navigate('/hackathon-selection');
+            navigate('/waiting-list?next=/hackathon-selection');
             setIsSubmitting(false);
         }, 1500);
     };
