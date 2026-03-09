@@ -14,7 +14,8 @@ import {
     LogOut,
     AlertTriangle,
     MonitorCheck,
-    RefreshCw
+    RefreshCw,
+    Github
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/technetics-head.svg';
@@ -60,11 +61,6 @@ const AptitudeRound = () => {
 
     // --- STRANGER TECH LOGIC: PERSISTENT TIMER ---
     const [timeLeft, setTimeLeft] = useState(() => {
-        const endTime = localStorage.getItem('aptitude_end_time');
-        if (endTime) {
-            const remaining = Math.floor((parseInt(endTime) - Date.now()) / 1000);
-            return remaining > 0 ? remaining : 0;
-        }
         const duration = 20 * 60; // 20 minutes
         const newEndTime = Date.now() + duration * 1000;
         localStorage.setItem('aptitude_end_time', newEndTime.toString());
@@ -123,7 +119,7 @@ const AptitudeRound = () => {
             localStorage.removeItem('aptitude_answers');
             localStorage.removeItem('aptitude_flagged');
             localStorage.removeItem('aptitude_switches');
-            navigate('/games');
+            navigate('/github-round');
             setIsSubmitting(false);
         }, 1500);
     };
@@ -221,7 +217,7 @@ const AptitudeRound = () => {
                         </div>
                     </div>
 
-                    <h1 className="text-5xl font-harry text-white mb-4 tracking-wider uppercase">Competition Frozen</h1>
+                    <h1 className="text-5xl font-wizard text-white mb-4 tracking-wider">Competition Frozen</h1>
 
                     <div className="bg-[#d4af37]/5 border border-[#d4af37]/20 rounded-xl p-4 mb-8 flex items-center gap-3 justify-center text-[#d4af37]">
                         <AlertTriangle size={20} />
@@ -319,7 +315,7 @@ const AptitudeRound = () => {
                             </div>
                             <div>
                                 <div className="flex items-center gap-2 mb-1">
-                                    <h3 className="text-xs font-black text-[#FFD700] uppercase tracking-wider">Aptitude Test</h3>
+                                    <h3 className="text-xs font-black text-[#FFD700] uppercase tracking-wider">Logic Flow</h3>
                                     <span className="text-[8px] px-1.5 py-0.5 bg-[#d4af37]/20 text-[#FFD700] rounded font-bold uppercase tracking-tighter">Active</span>
                                 </div>
                                 <p className="text-[10px] text-gray-400">4 Magic Riddles</p>
@@ -329,11 +325,11 @@ const AptitudeRound = () => {
                         {/* Flowchart */}
                         <div className="relative flex gap-4 opacity-40">
                             <div className="z-10 w-10 h-10 rounded-full bg-gray-900 border border-gray-700 flex items-center justify-center text-gray-500 shrink-0">
-                                <Activity size={20} />
+                                <Github size={20} />
                             </div>
                             <div>
                                 <div className="flex items-center gap-2 mb-1">
-                                    <h3 className="text-xs font-black text-gray-400 uppercase tracking-wider">Logic Flow</h3>
+                                    <h3 className="text-xs font-black text-gray-400 uppercase tracking-wider">GitHub Sync</h3>
                                     <Lock size={10} />
                                 </div>
                                 <p className="text-[10px] text-gray-600">Locked</p>
@@ -347,7 +343,7 @@ const AptitudeRound = () => {
                             </div>
                             <div>
                                 <div className="flex items-center gap-2 mb-1">
-                                    <h3 className="text-xs font-black text-gray-400 uppercase tracking-wider">The Duel</h3>
+                                    <h3 className="text-xs font-black text-gray-400 uppercase tracking-wider">15-Hour Hackathon</h3>
                                     <Lock size={10} />
                                 </div>
                                 <p className="text-[10px] text-gray-600">Locked</p>
