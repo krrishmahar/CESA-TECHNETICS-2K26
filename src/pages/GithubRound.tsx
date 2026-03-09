@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
     Clock,
@@ -44,7 +44,7 @@ const GithubRound = () => {
     }, [submissionLink]);
 
     // --- SUBMISSION LOGIC ---
-    const handleSubmit = async () => {
+    const handleSubmit = useCallback(() => {
         if (isSubmitting || !submissionLink) return;
 
         setError(null);
@@ -69,7 +69,7 @@ const GithubRound = () => {
             navigate('/waiting-list?next=/hackathon-selection');
             setIsSubmitting(false);
         }, 1500);
-    };
+    }, [isSubmitting, submissionLink, navigate]);
 
     // --- TIMER EFFECT (DRIFT-FREE) ---
     useEffect(() => {
@@ -91,7 +91,7 @@ const GithubRound = () => {
             }
         }, 1000);
         return () => clearInterval(timer);
-    }, []);
+    }, [handleSubmit]);
 
     // --- ANTI-CHEAT EFFECTS ---
     useEffect(() => {

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
     Clock,
@@ -104,7 +104,7 @@ const AptitudeRound = () => {
     }, [isFrozen]);
 
     // --- SUBMISSION LOGIC ---
-    const handleSubmit = async () => {
+    const handleSubmit = useCallback(() => {
         if (isSubmitting) return;
         setIsSubmitting(true);
 
@@ -127,7 +127,7 @@ const AptitudeRound = () => {
             navigate('/waiting-list?next=/github-round');
             setIsSubmitting(false);
         }, 1500);
-    };
+    }, [isSubmitting, answers, navigate]);
 
     // --- TIMER EFFECT (DRIFT-FREE SERVER-STYLE TIMER) ---
     useEffect(() => {
@@ -149,8 +149,7 @@ const AptitudeRound = () => {
             }
         }, 1000);
         return () => clearInterval(timer);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [handleSubmit]);
 
     // --- ANTI-CHEAT EFFECTS ---
     useEffect(() => {
