@@ -3,6 +3,7 @@ import MainLayout from "./layouts/MainLayout";
 import GamesPage from "./pages/GamesPage";
 import WaitingListPage from "./pages/WaitingListPage";
 import DarkMarkBountyPage from "./pages/DarkMarkBountyPage";
+import AptitudeRound from './pages/AptitudeRound.tsx';
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
         <Routes>
           <Route path="/" element={<MainLayout />} />
           <Route path="/games" element={<GamesPage />} />
+          <Route path="/aptitude-round" element={<AptitudeRound />} />
           <Route path="/waiting-list" element={<WaitingListPage />} />
           <Route path="/dark-mark-bounty" element={<DarkMarkBountyPage />} />
         </Routes>

@@ -15,6 +15,8 @@ const GamesPage = () => {
     e.preventDefault();
     if (event.title === "The Dark Mark Bounty") {
       navigate("/dark-mark-bounty");
+    } else if (event.title === "The Order of the Obscure Code") {
+      navigate("/aptitude-round");
     } else {
       navigate("/waiting-list");
     }
