@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import type { Team } from "../../../types/darkMarkBounty";
-import { ENVELOPE_CODES } from "../../../data/darkMarkBounty/envelopeCodes";
+import type { Team, Envelope } from "../../../types/darkMarkBounty";
 import { GAME_NAMES } from "../../../utils/darkMarkBounty/gameHelpers";
 
 interface Props {
   teams: Team[];
-  codes: Record<string, { color: string; difficulty: string; points: number }>;
+  codes: Record<string, Envelope>;
   onBack: () => void;
+  onUpdateCode: (oldCode: string, newCode: string) => boolean;
   onReset: () => void;
 }
 
@@ -16,9 +16,13 @@ export const AdminScreen: React.FC<Props> = ({
   teams,
   codes,
   onBack,
+  onUpdateCode,
   onReset,
 }) => {
   const [tab, setTab] = useState<Tab>("teams");
+  const [editCodeId, setEditCodeId] = useState<string | null>(null);
+  const [editValue, setEditValue] = useState("");
+
   const totalCodes = Object.keys(codes).length;
   const usedCodes = teams.flatMap((t) => t.usedCodes);
 
@@ -84,10 +88,47 @@ export const AdminScreen: React.FC<Props> = ({
             {Object.entries(codes).map(([code, info]) => (
               <div
                 key={code}
-                className={`code-chip code-${info.color} ${usedCodes.includes(code as any) ? "used" : ""}`}
+                className={`code-chip code-${info.color} ${(usedCodes as string[]).includes(code) ? "used" : ""}`}
               >
-                {code}
-                {usedCodes.includes(code as any) && <span> ✓</span>}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <strong>
+                      {editCodeId === code ? (
+                        <input
+                          autoFocus
+                          value={editValue}
+                          onChange={(e) => setEditValue(e.target.value.toUpperCase())}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              if (onUpdateCode(code, editValue)) {
+                                setEditCodeId(null);
+                              }
+                            } else if (e.key === "Escape") {
+                              setEditCodeId(null);
+                            }
+                          }}
+                          onBlur={() => setEditCodeId(null)}
+                          style={{ background: '#222', color: '#fff', border: '1px solid #444', width: '80px', padding: '2px 4px' }}
+                        />
+                      ) : (
+                        code
+                      )}
+                    </strong>
+                    {(usedCodes as string[]).includes(code) && <span> ✓</span>}
+                  </div>
+                  <div style={{ fontSize: '0.7em', display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: 0.8 }}>
+                    <span>{info.points}pts · {GAME_NAMES[0]}</span>
+                    {!editCodeId && !(usedCodes as string[]).includes(code) && (
+                      <button 
+                        onClick={() => { setEditCodeId(code); setEditValue(code); }}
+                        style={{ background: 'transparent', border: 'none', color: '#aaa', cursor: 'pointer', padding: 0 }}
+                        title="Edit Code"
+                      >
+                        ✏️
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
             ))}
           </div>
@@ -96,37 +137,34 @@ export const AdminScreen: React.FC<Props> = ({
 
       {tab === "details" && (
   <div className="admin-content">
-    <div className="details-grid" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-      {Object.entries(ENVELOPE_CODES).map(([code, info]) => {
-        const solvedInfo = teams.flatMap(t => t.solved).find(s => s.code === code);
-        console.log(teams.flatMap(t => t.solved))
-        const gameName = solvedInfo ? GAME_NAMES[solvedInfo.game] : "Mystery Game";
-        const difficultyColor = info.color === 'yellow' ? '#f1c40f' : info.color === 'orange' ? '#e67e22' : '#e74c3c';
-
-        return (
+    <div className="details-list" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      {Object.entries(codes).map(([code, info]) => (
         <div key={code} className="admin-team-card">
-          <div className="atc-rank" style={{ fontSize: '1rem', width: '150px', textAlign: 'left', color: difficultyColor }}>
-            {code} <br/>
-            <span style={{ fontSize: '0.75rem', opacity: 0.9 }}>{gameName}</span>
+          {/* Left Side: Code Identifier */}
+          <div className="atc-rank" style={{ fontSize: '0.85rem', width: '70px', background: '#333' }}>
+            {code}
           </div>
+
+          {/* Center: Game Info */}
           <div className="atc-info">
-            <strong style={{ color: difficultyColor }}>
-              {info.difficulty.toUpperCase()}
+            <strong style={{ fontSize: '1.1rem' }}>
+              {GAME_NAMES[info.difficulty] || "Unknown Game"}
             </strong>
-            <span>
-              {info.points} Points · {info.color.charAt(0).toUpperCase() + info.color.slice(1)} Envelope
+            <span style={{ opacity: 0.8 }}>
+              {info.difficulty.toUpperCase()} · {info.points} Points
             </span>
           </div>
+
+          {/* Right Side: Status Indicator */}
           <div className="atc-score">
-            {usedCodes.includes(code as any) ? (
-              <span style={{ color: '#00ff88', fontSize: '0.8rem' }}>COMPLETED</span>
+            {(usedCodes as string[]).includes(code) ? (
+              <span style={{ color: '#00ff88', fontSize: '0.75rem', fontWeight: 'bold' }}>✓ USED</span>
             ) : (
-              <span style={{ opacity: 0.5, fontSize: '0.8rem' }}>AVAILABLE</span>
+              <span style={{ color: '#aaa', fontSize: '0.75rem' }}>AVAILABLE</span>
             )}
           </div>
         </div>
-        );
-      })}
+      ))}
     </div>
   </div>
 )}
