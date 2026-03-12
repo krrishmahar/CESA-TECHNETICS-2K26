@@ -6,6 +6,7 @@ import DarkMarkBountyPage from "./pages/DarkMarkBountyPage";
 import AptitudeRound from './pages/AptitudeRound.tsx';
 import GithubRound from './pages/GithubRound.tsx';
 import HackathonSelection from './pages/HackathonSelection.tsx';
+import AdminDashboard from './pages/AdminDashboard.tsx';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/hackathon-selection" element={<HackathonSelection />} />
           <Route path="/waiting-list" element={<WaitingListPage />} />
           <Route path="/dark-mark-bounty" element={<DarkMarkBountyPage />} />
+          <Route path="/admin" element={<AdminDashboard />} />
         </Routes>
       </div>
     </Router>

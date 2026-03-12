@@ -8,17 +8,38 @@ const techEventsList = eventsList.filter((event) =>
   techTags.includes(event.tag),
 );
 
+import { login } from '../api/auth';
+
 const GamesPage = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = React.useState<string | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
 
-  const handleEnter = (e: React.FormEvent, event: (typeof eventsList)[0]) => {
+  const handleEnter = async (e: React.FormEvent<HTMLFormElement>, event: (typeof eventsList)[0]) => {
     e.preventDefault();
-    if (event.title === "The Dark Mark Bounty") {
-      navigate("/dark-mark-bounty");
-    } else if (event.title === "The Order of the Obscure Code") {
-      navigate("/aptitude-round");
-    } else {
-      navigate("/waiting-list");
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+
+    setLoading(event.title);
+    setError(null);
+
+    try {
+        const result = await login(email, password);
+        if (result.type === 'admin') {
+            localStorage.setItem('admin_data', JSON.stringify(result.data));
+            navigate('/admin');
+            return;
+        } else {
+            localStorage.setItem('participant_data', JSON.stringify(result.data));
+            // Ensure they check into the waiting list first
+            // Convert title to slug
+            navigate(`/waiting-list?event=${event.title.toLowerCase().replace(/\s+/g, '-')}`);
+        }
+    } catch (err: any) {
+        setError("Invalid email or password");
+    } finally {
+        setLoading(null);
     }
   };
 
@@ -81,8 +102,14 @@ const GamesPage = () => {
                 onSubmit={(e) => handleEnter(e, event)}
                 className="space-y-4 font-sans"
               >
+                {error && loading === event.title && (
+                  <div className="text-red-500 text-sm font-bold text-center">
+                    {error}
+                  </div>
+                )}
                 <div>
                   <input
+                    name="email"
                     type="email"
                     placeholder="Leader email"
                     required
@@ -91,6 +118,7 @@ const GamesPage = () => {
                 </div>
                 <div>
                   <input
+                    name="password"
                     type="password"
                     placeholder="Password"
                     required
@@ -104,9 +132,10 @@ const GamesPage = () => {
                   }}
                   whileTap={{ scale: 0.98 }}
                   type="submit"
-                  className="w-full bg-linear-to-r from-[#8a6e2e] to-[#d4af37] text-black font-bold py-3 px-4 rounded hover:from-[#d4af37] hover:to-[#FFD700] transition-colors mt-6 text-2xl tracking-wide shadow-[0_0_10px_rgba(212,175,55,0.4)] font-wizard"
+                  disabled={loading === event.title}
+                  className="w-full bg-linear-to-r from-[#8a6e2e] to-[#d4af37] text-black font-bold py-3 px-4 rounded hover:from-[#d4af37] hover:to-[#FFD700] transition-colors mt-6 text-2xl tracking-wide shadow-[0_0_10px_rgba(212,175,55,0.4)] font-wizard disabled:opacity-50"
                 >
-                  Enter
+                  {loading === event.title ? 'Authenticating...' : 'Enter'}
                 </motion.button>
               </form>
             </div>

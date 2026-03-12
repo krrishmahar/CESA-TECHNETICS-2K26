@@ -16,6 +16,10 @@ import { LeaderboardScreen } from "./screens/LeaderboardScreen";
 import { AdminScreen } from "./screens/AdminScreen";
 import "./styles/darkMarkBounty.css";
 
+import { useServerTimer } from "../../hooks/useServerTimer";
+
+const ROUND_ID = "4";
+
 export const DarkMarkBounty: React.FC = () => {
   const [screen, setScreen] = useState<Screen>("landing");
   const [teams, setTeams] = useState<Team[]>(INITIAL_TEAMS);
@@ -26,8 +30,14 @@ export const DarkMarkBounty: React.FC = () => {
   const [codeError, setCodeError] = useState("");
 
   const { notification, showNotification } = useNotification();
+  const { timerState, formattedTime } = useServerTimer(ROUND_ID);
 
   const handleCodeSubmit = () => {
+    if (timerState?.timerStatus !== "running") {
+      setCodeError("The round is not active!");
+      return;
+    }
+
     const code = codeInput.trim().toUpperCase() as keyof typeof ENVELOPE_CODES;
     const envelope = ENVELOPE_CODES[code];
 
@@ -124,76 +134,92 @@ export const DarkMarkBounty: React.FC = () => {
 
   return (
     <div className="dark-mark-bounty-root">
-      {notification && (
-        <div className={`notif notif-${notification.type}`}>
-          {notification.msg}
-        </div>
-      )}
+      {/* GLOBAL SERVER TIMER BANNER */}
+      <div style={{
+          position: 'fixed', top: 0, left: 0, width: '100%', zIndex: 9999,
+          background: 'rgba(5, 17, 18, 0.9)', backdropFilter: 'blur(5px)',
+          borderBottom: '1px solid rgba(212, 175, 55, 0.3)', padding: '10px',
+          textAlign: 'center', color: '#FFD700', fontFamily: '"Cinzel", serif',
+          display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '20px'
+      }}>
+          <span style={{ fontSize: '14px', letterSpacing: '2px', textTransform: 'uppercase' }}>Dark Mark Bounty</span>
+          <span style={{ fontSize: '24px', fontWeight: 'bold' }}>
+               {timerState?.timerStatus === "running" ? formattedTime : timerState?.timerStatus || "SYNCING..."}
+          </span>
+      </div>
 
-      {screen === "landing" && (
-        <LandingScreen
-          onTeam={() => setScreen("login")}
-          onLeader={() => setScreen("leaderboard")}
-          onAdmin={() => {
-            setAdminView(true);
-            setScreen("admin");
-          }}
-        />
-      )}
+      <div style={{ paddingTop: '60px', height: '100%' }}>
+          {notification && (
+            <div className={`notif notif-${notification.type}`}>
+              {notification.msg}
+            </div>
+          )}
 
-      {screen === "login" && (
-        <LoginScreen
-          teams={teams}
-          onLogin={loginTeam}
-          onRegister={() => setScreen("register")}
-          onBack={() => setScreen("landing")}
-        />
-      )}
+          {screen === "landing" && (
+            <LandingScreen
+              onTeam={() => setScreen("login")}
+              onLeader={() => setScreen("leaderboard")}
+              onAdmin={() => {
+                setAdminView(true);
+                setScreen("admin");
+              }}
+            />
+          )}
 
-      {screen === "register" && (
-        <RegisterScreen
-          onRegister={registerTeam}
-          onBack={() => setScreen("login")}
-        />
-      )}
+          {screen === "login" && (
+            <LoginScreen
+              teams={teams}
+              onLogin={loginTeam}
+              onRegister={() => setScreen("register")}
+              onBack={() => setScreen("landing")}
+            />
+          )}
 
-      {screen === "team" && currentTeam && (
-        <TeamDashboard
-          team={teams.find((t) => t.id === currentTeam.id) || currentTeam}
-          codeInput={codeInput}
-          setCodeInput={setCodeInput}
-          codeError={codeError}
-          onSubmitCode={handleCodeSubmit}
-          onLeaderboard={() => setScreen("leaderboard")}
-          onLogout={() => {
-            setCurrentTeam(null);
-            setScreen("landing");
-          }}
-        />
-      )}
+          {screen === "register" && (
+            <RegisterScreen
+              onRegister={registerTeam}
+              onBack={() => setScreen("login")}
+            />
+          )}
 
-      {screen === "game" && activeGame && (
-        <GameScreen game={activeGame} onComplete={handleGameComplete} />
-      )}
+          {screen === "team" && currentTeam && (
+            <TeamDashboard
+              team={teams.find((t) => t.id === currentTeam.id) || currentTeam}
+              codeInput={codeInput}
+              setCodeInput={setCodeInput}
+              codeError={codeError}
+              onSubmitCode={handleCodeSubmit}
+              onLeaderboard={() => setScreen("leaderboard")}
+              onLogout={() => {
+                setCurrentTeam(null);
+                setScreen("landing");
+              }}
+            />
+          )}
 
-      {screen === "leaderboard" && (
-        <LeaderboardScreen
-          teams={sortedTeams}
-          onBack={() => setScreen(currentTeam ? "team" : "landing")}
-        />
-      )}
+          {screen === "game" && activeGame && (
+            <GameScreen game={activeGame} onComplete={handleGameComplete} />
+          )}
 
-      {screen === "admin" && (
-        <AdminScreen
-          teams={sortedTeams}
-          codes={ENVELOPE_CODES}
-          onBack={() => setScreen("landing")}
-          onReset={() => {
-            setTeams(INITIAL_TEAMS);
-            showNotification("All scores reset", "warn");
-          }}
-        />
-      )}
+          {screen === "leaderboard" && (
+            <LeaderboardScreen
+              teams={sortedTeams}
+              onBack={() => setScreen(currentTeam ? "team" : "landing")}
+            />
+          )}
+
+          {screen === "admin" && (
+            <AdminScreen
+              teams={sortedTeams}
+              codes={ENVELOPE_CODES}
+              onBack={() => setScreen("landing")}
+              onReset={() => {
+                setTeams(INITIAL_TEAMS);
+                showNotification("All scores reset", "warn");
+              }}
+            />
+          )}
+      </div>
     </div>
   );
 };
