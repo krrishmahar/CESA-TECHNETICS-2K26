@@ -12,18 +12,23 @@ import {
     Square, 
     StopCircle,
     Upload,
-    LogOut
+    LogOut,
+    Sparkles,
+    Github,
+    Activity
 } from 'lucide-react';
+
 import { API_BASE_URL } from '../api/auth';
 import { useServerTimer } from '../hooks/useServerTimer';
+import { useGameStore } from '../store/useGameStore';
 
 const ROUND_ID_APTITUDE = "1"; // order round
 const ROUND_ID_DARKMARK = "4"; // boss round
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
+    const { user, logout } = useGameStore();
     const [activeTab, setActiveTab] = useState<'aptitude' | 'darkmark' | 'leaderboard'>('aptitude');
-    const [adminData, setAdminData] = useState<any>(null);
 
     // Aptitude State
     const { timerState: aptTimer, formattedTime: aptTime } = useServerTimer(ROUND_ID_APTITUDE);
@@ -36,15 +41,15 @@ const AdminDashboard = () => {
     // Leaderboard State
     const [aptLeaderboard, setAptLeaderboard] = useState<any[]>([]);
     const [dmLeaderboard, setDmLeaderboard] = useState<any[]>([]);
+    const [roundMetrics, setRoundMetrics] = useState<any>(null);
+
 
     useEffect(() => {
-        const stored = localStorage.getItem('admin_data');
-        if (!stored) {
+        if (!user) {
             navigate('/games');
             return;
         }
-        setAdminData(JSON.parse(stored));
-    }, [navigate]);
+    }, [navigate, user]);
 
     useEffect(() => {
         if (activeTab === 'aptitude') {
@@ -96,9 +101,28 @@ const AdminDashboard = () => {
         }
     }, [activeTab]);
 
+    useEffect(() => {
+        if (!user) return;
+        const fetchMetrics = async () => {
+            try {
+                const res = await fetch(`${API_BASE_URL}/admin/metrics/participant-distribution`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setRoundMetrics(data);
+                }
+            } catch (e) {
+                console.error("Failed to fetch metrics", e);
+            }
+        };
+        fetchMetrics();
+        const interval = setInterval(fetchMetrics, 30000);
+        return () => clearInterval(interval);
+    }, [user]);
+
+
     const handleTimerAction = async (roundId: string, action: 'start' | 'pause' | 'resume' | 'stop' | 'expire') => {
         try {
-            const adminId = adminData?.admin?.id || "1";
+            const adminId = user?.id || "1";
             await fetch(`${API_BASE_URL}/timer/round/${roundId}/${action}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -115,7 +139,7 @@ const AdminDashboard = () => {
             await fetch(`${API_BASE_URL}/admin/rounds/${ROUND_ID_APTITUDE}/qualify`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ topN, adminId: adminData?.admin?.id || "1" })
+                body: JSON.stringify({ topN, adminId: user?.id || "1" })
             });
             alert(`Qualified top ${topN} teams`);
         } catch (e) {
@@ -124,7 +148,7 @@ const AdminDashboard = () => {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem('admin_data');
+        logout();
         navigate('/games');
     };
 
@@ -176,9 +200,119 @@ const AdminDashboard = () => {
                     </h2>
                     <div className="flex items-center gap-3 text-sm font-bold bg-[#d4af37]/10 px-4 py-2 rounded-lg border border-[#d4af37]/30">
                         <span className="text-gray-400">Admin:</span>
-                        <span className="text-[#FFD700]">{adminData?.admin?.username || 'Root'}</span>
+                        <span className="text-[#FFD700]">{user?.username || 'Root'}</span>
                     </div>
                 </header>
+
+                {/* Live Metrics Summary */}
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+                    <div className="bg-[#051112] border border-[#d4af37]/20 p-4 rounded-xl">
+                        <div className="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Waiting Area</div>
+                        <div className="text-2xl font-wizard text-white">{roundMetrics?.waiting || 0}</div>
+                    </div>
+                    <div className="bg-[#051112] border border-[#d4af37]/20 p-4 rounded-xl">
+                        <div className="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Event 1 Total</div>
+                        <div className="text-2xl font-wizard text-[#FFD700]">{roundMetrics?.event1 || 0}</div>
+                    </div>
+                    <div className="bg-[#0a1819] border border-[#d4af37]/40 p-4 rounded-xl shadow-[0_0_10px_rgba(212,175,55,0.1)]">
+                        <div className="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Round 1 (Apt)</div>
+                        <div className="text-2xl font-wizard text-[#FFD700]">{roundMetrics?.aptitude || 0}</div>
+                    </div>
+                    <div className="bg-[#0a1819] border border-[#d4af37]/40 p-4 rounded-xl shadow-[0_0_10px_rgba(212,175,55,0.1)]">
+                        <div className="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Round 2 (Git)</div>
+                        <div className="text-2xl font-wizard text-[#FFD700]">{roundMetrics?.github || 0}</div>
+                    </div>
+                    <div className="bg-[#0a1819] border border-[#d4af37]/40 p-4 rounded-xl shadow-[0_0_10px_rgba(212,175,55,0.1)]">
+                        <div className="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Round 3 (Hack)</div>
+                        <div className="text-2xl font-wizard text-green-500">{roundMetrics?.hackathon || 0}</div>
+                    </div>
+                    <div className="bg-[#0d1c1d] border border-blue-500/30 p-4 rounded-xl">
+                        <div className="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Event 2 (Bounty)</div>
+                        <div className="text-2xl font-wizard text-blue-500">{roundMetrics?.darkmark || 0}</div>
+                    </div>
+                </div>
+
+                {/* Game Control Protocol */}
+                <div className="bg-[#051112] border border-[#d4af37]/30 p-6 rounded-2xl shadow-[0_0_20px_rgba(212,175,55,0.1)] mb-8">
+                    <h3 className="text-xl font-bold text-white flex items-center gap-2 mb-6"><Play size={20} className="text-[#FFD700]"/> Global Arena Control</h3>
+                    <div className="flex flex-wrap gap-4">
+                        <button 
+                            onClick={async () => {
+                                if (!confirm("Start Round 1 (Aptitude)?")) return;
+                                await fetch(`${API_BASE_URL}/admin/events/the-order-of-obscure-code/start`, {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ redirectTo: "/aptitude-round", roundId: "1" })
+                                });
+                                alert("Everyone pushed to Round 1");
+                            }}
+                            className="bg-green-600 hover:bg-green-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg flex items-center gap-2 hover:scale-105 transition-all"
+                        >
+                            <Play size={18}/> Start Round 1
+                        </button>
+
+                        <button 
+                            onClick={async () => {
+                                if (!confirm("Start Round 2 (GitHub)?")) return;
+                                await fetch(`${API_BASE_URL}/admin/events/the-order-of-obscure-code/start`, {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ redirectTo: "/github-round", roundId: "2" })
+                                });
+                                alert("Everyone pushed to Round 2");
+                            }}
+                            className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg flex items-center gap-2 hover:scale-105 transition-all"
+                        >
+                            <Github size={18}/> Start Round 2
+                        </button>
+
+                        <button 
+                            onClick={async () => {
+                                if (!confirm("Start Round 3 (Hackathon)?")) return;
+                                await fetch(`${API_BASE_URL}/admin/events/the-order-of-obscure-code/start`, {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ redirectTo: "/hackathon-selection", roundId: "3" })
+                                });
+                                alert("Everyone pushed to Round 3");
+                            }}
+                            className="bg-purple-600 hover:bg-purple-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg flex items-center gap-2 hover:scale-105 transition-all"
+                        >
+                            <Sparkles size={18}/> Start Round 3
+                        </button>
+
+                        <button 
+                            onClick={async () => {
+                                if (!confirm("Start Event 2 (Dark Mark)?")) return;
+                                await fetch(`${API_BASE_URL}/admin/events/dark-mark-bounty/start`, {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ redirectTo: "/dark-mark-bounty", roundId: "4" })
+                                });
+                                alert("Everyone pushed to Dark Mark Bounty");
+                            }}
+                            className="bg-orange-600 hover:bg-orange-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg flex items-center gap-2 hover:scale-105 transition-all"
+                        >
+                            <Activity size={18}/> Start Event 2
+                        </button>
+
+                        <button 
+                            onClick={async () => {
+                                if (!confirm("Are you sure you want to RESET everyone to the waiting room?")) return;
+                                await fetch(`${API_BASE_URL}/admin/events/reset-all`, {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ redirectTo: "/waiting-list", roundId: null })
+                                });
+                                alert("Arena Reset: Everyone sent to Waiting Room");
+                            }}
+                            className="bg-red-600 hover:bg-red-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg flex items-center gap-2 hover:scale-105 transition-all ml-auto"
+                        >
+                            <Square size={18}/> Reset Arena
+                        </button>
+                    </div>
+                </div>
+
 
                 <motion.div
                     key={activeTab}
@@ -205,11 +339,12 @@ const AdminDashboard = () => {
                                         <button onClick={() => handleTimerAction(ROUND_ID_APTITUDE, 'stop')} className="p-2 bg-orange-900/40 text-orange-500 hover:bg-orange-900/80 rounded" title="Stop"><Square size={20}/></button>
                                         <button onClick={() => handleTimerAction(ROUND_ID_APTITUDE, 'expire')} className="p-2 bg-red-900/40 text-red-500 hover:bg-red-900/80 rounded" title="Expire"><StopCircle size={20}/></button>
                                     </div>
-                                    <div className="ml-auto">
-                                        <button onClick={() => handleQualify(10)} className="bg-linear-to-r from-[#8a6e2e] to-[#d4af37] text-black px-4 py-2 rounded-lg font-bold shadow-lg flex items-center gap-2">
-                                            <Trophy size={16}/> Qualify Top 10
+                                    <div className="ml-auto flex gap-2">
+                                        <button onClick={() => handleQualify(10)} className="bg-linear-to-r from-[#8a6e2e] to-[#d4af37] text-black px-4 py-3 rounded-xl font-bold shadow-lg flex items-center gap-2 hover:scale-105 transition-transform">
+                                            <Trophy size={18}/> Qualify Top 10
                                         </button>
                                     </div>
+
                                 </div>
                             </div>
 
@@ -217,7 +352,39 @@ const AdminDashboard = () => {
                             <div className="bg-[#051112] border border-[#d4af37]/30 p-6 rounded-2xl shadow-[0_0_20px_rgba(212,175,55,0.1)]">
                                 <div className="flex justify-between items-center mb-6">
                                     <h3 className="text-xl font-bold text-white flex items-center gap-2"><Database /> Questions DB</h3>
-                                    <button className="flex items-center gap-2 text-sm border border-[#d4af37] text-[#d4af37] px-4 py-1.5 rounded-lg hover:bg-[#d4af37]/10 transition-colors">
+                                    <button 
+                                        onClick={() => {
+                                            const input = document.createElement('input');
+                                            input.type = 'file';
+                                            input.accept = '.json';
+                                            input.onchange = async (e: any) => {
+                                                const file = e.target.files[0];
+                                                if (!file) return;
+                                                const reader = new FileReader();
+                                                reader.onload = async (event) => {
+                                                    try {
+                                                        const questionsData = JSON.parse(event.target?.result as string);
+                                                        await fetch(`${API_BASE_URL}/admin/rounds/${ROUND_ID_APTITUDE}/questions/bulk`, {
+                                                            method: 'POST',
+                                                            headers: { 'Content-Type': 'application/json' },
+                                                            body: JSON.stringify({ questions: questionsData, adminId: user?.id })
+                                                        });
+                                                        alert("Questions uploaded successfully");
+                                                        // Refresh list
+                                                        fetch(`${API_BASE_URL}/questions/round/${ROUND_ID_APTITUDE}`)
+                                                            .then(res => res.json())
+                                                            .then(data => setQuestions(data || []));
+                                                    } catch (err) {
+                                                        console.error(err);
+                                                        alert("Failed to upload questions");
+                                                    }
+                                                };
+                                                reader.readAsText(file);
+                                            };
+                                            input.click();
+                                        }}
+                                        className="flex items-center gap-2 text-sm border border-[#d4af37] text-[#d4af37] px-4 py-1.5 rounded-lg hover:bg-[#d4af37]/10 transition-colors"
+                                    >
                                         <Upload size={16} /> Bulk Upload
                                     </button>
                                 </div>

@@ -7,6 +7,7 @@ import AptitudeRound from './pages/AptitudeRound.tsx';
 import GithubRound from './pages/GithubRound.tsx';
 import HackathonSelection from './pages/HackathonSelection.tsx';
 import AdminDashboard from './pages/AdminDashboard.tsx';
+import GameProtectedRoute from "./components/GameProtectedRoute";
 
 function App() {
   return (
@@ -15,11 +16,32 @@ function App() {
         <Routes>
           <Route path="/" element={<MainLayout />} />
           <Route path="/games" element={<GamesPage />} />
-          <Route path="/aptitude-round" element={<AptitudeRound />} />
-          <Route path="/github-round" element={<GithubRound />} />
-          <Route path="/hackathon-selection" element={<HackathonSelection />} />
+          
+          <Route path="/aptitude-round" element={
+            <GameProtectedRoute requiredRoundId="1">
+              <AptitudeRound />
+            </GameProtectedRoute>
+          } />
+          
+          <Route path="/github-round" element={
+            <GameProtectedRoute requiredRoundId="2">
+              <GithubRound />
+            </GameProtectedRoute>
+          } />
+          
+          <Route path="/hackathon-selection" element={
+            <GameProtectedRoute requiredRoundId="3">
+              <HackathonSelection />
+            </GameProtectedRoute>
+          } />
+
+          <Route path="/dark-mark-bounty" element={
+            <GameProtectedRoute requiredRoundId="4">
+              <DarkMarkBountyPage />
+            </GameProtectedRoute>
+          } />
+
           <Route path="/waiting-list" element={<WaitingListPage />} />
-          <Route path="/dark-mark-bounty" element={<DarkMarkBountyPage />} />
           <Route path="/admin" element={<AdminDashboard />} />
         </Routes>
       </div>

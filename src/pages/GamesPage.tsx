@@ -9,11 +9,15 @@ const techEventsList = eventsList.filter((event) =>
 );
 
 import { login } from '../api/auth';
+import { useGameStore } from '../store/useGameStore';
+
 
 const GamesPage = () => {
   const navigate = useNavigate();
+  const setAuth = useGameStore(state => state.setAuth);
   const [loading, setLoading] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
+
 
   const handleEnter = async (e: React.FormEvent<HTMLFormElement>, event: (typeof eventsList)[0]) => {
     e.preventDefault();
@@ -27,15 +31,18 @@ const GamesPage = () => {
     try {
         const result = await login(email, password);
         if (result.type === 'admin') {
+            setAuth(result.data.admin, 'admin');
             localStorage.setItem('admin_data', JSON.stringify(result.data));
             navigate('/admin');
             return;
         } else {
+            setAuth(result.data.participant, 'participant');
             localStorage.setItem('participant_data', JSON.stringify(result.data));
             // Ensure they check into the waiting list first
             // Convert title to slug
             navigate(`/waiting-list?event=${event.title.toLowerCase().replace(/\s+/g, '-')}`);
         }
+
     } catch (err: any) {
         setError("Invalid email or password");
     } finally {

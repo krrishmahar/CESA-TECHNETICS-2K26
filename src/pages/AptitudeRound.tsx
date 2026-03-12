@@ -21,6 +21,8 @@ import { useNavigate } from 'react-router-dom';
 import logo from '../assets/technetics-head.svg';
 import { API_BASE_URL } from '../api/auth';
 import { useServerTimer } from '../hooks/useServerTimer';
+import { useAntiCheat } from '../hooks/useAntiCheat';
+
 
 interface Question {
     id: string;
@@ -42,6 +44,8 @@ const AptitudeRound = () => {
     const [isLoading, setIsLoading] = useState(true);
 
     const { timerState, timeLeft, formattedTime } = useServerTimer(ROUND_ID);
+    useAntiCheat(ROUND_ID);
+
 
     // --- STRANGER TECH LOGIC: ANTI-CHEAT STATE ---
     const [switchesLeft, setSwitchesLeft] = useState(() => {
@@ -146,35 +150,7 @@ const AptitudeRound = () => {
         }
     }, [isSubmitting, registrationId, navigate]);
 
-    // --- ANTI-CHEAT EFFECTS ---
-    useEffect(() => {
-        const handleVisibilityChange = () => {
-            if (document.hidden && !isFrozen) {
-                setSwitchesLeft(prev => {
-                    const newCount = Math.max(0, prev - 1);
-                    if (newCount === 0) setIsFrozen(true);
-                    return newCount;
-                });
-            }
-        };
 
-        const blockAction = (e: Event) => {
-            e.preventDefault();
-            return false;
-        };
-
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-        document.addEventListener('copy', blockAction);
-        document.addEventListener('paste', blockAction);
-        document.addEventListener('contextmenu', blockAction);
-
-        return () => {
-            document.removeEventListener('visibilitychange', handleVisibilityChange);
-            document.removeEventListener('copy', blockAction);
-            document.removeEventListener('paste', blockAction);
-            document.removeEventListener('contextmenu', blockAction);
-        };
-    }, [isFrozen]);
 
     const handleOptionSelect = async (optionValue: string, questionId: string) => {
         if (timerState?.timerStatus !== 'running') {
@@ -225,7 +201,7 @@ const AptitudeRound = () => {
                     animate={{ opacity: 1, scale: 1 }}
                     className="max-w-md w-full bg-[#0a1515] border-2 border-[#d4af37]/30 rounded-3xl p-10 text-center shadow-[0_0_50px_rgba(212,175,55,0.1)] relative overflow-hidden"
                 >
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-1 bg-gradient-to-r from-transparent via-[#d4af37]/50 to-transparent" />
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-1 bg-linear-to-r from-transparent via-[#d4af37]/50 to-transparent" />
                     <div className="mb-8 relative inline-block">
                         <div className="absolute inset-0 bg-[#d4af37]/20 blur-2xl rounded-full" />
                         <div className="w-20 h-20 rounded-2xl bg-[#d4af37]/10 border-2 border-[#d4af37]/40 flex items-center justify-center relative z-10">
@@ -247,11 +223,12 @@ const AptitudeRound = () => {
                             setIsFrozen(false);
                             setSwitchesLeft(3);
                         }}
-                        className="w-full py-4 rounded-xl bg-gradient-to-r from-[#8a6e2e] to-[#d4af37] text-black font-wizard font-bold text-lg hover:from-[#d4af37] hover:to-[#FFD700] transition-all flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(212,175,55,0.3)] group"
+                        className="w-full py-4 rounded-xl bg-linear-to-r from-[#8a6e2e] to-[#d4af37] text-black font-wizard font-bold text-lg hover:from-[#d4af37] hover:to-[#FFD700] transition-all flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(212,175,55,0.3)] group"
                     >
                         <RefreshCw size={20} className="group-hover:rotate-180 transition-transform duration-500" />
                         <span>Refresh Status</span>
                     </button>
+
                 </motion.div>
             </div>
         );
@@ -480,6 +457,7 @@ const AptitudeRound = () => {
                                     initial={{ width: 0 }}
                                     animate={{ width: `${progressPercent}%` }}
                                     className="h-full bg-linear-to-r from-[#8a6e2e] to-[#d4af37] shadow-[0_0_10px_rgba(212,175,55,0.5)]"
+
                                 />
                             </div>
                         </div>

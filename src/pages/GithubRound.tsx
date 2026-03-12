@@ -15,9 +15,11 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/technetics-head.svg';
+import { useAntiCheat } from '../hooks/useAntiCheat';
 
 const GithubRound = () => {
     const navigate = useNavigate();
+    useAntiCheat("2"); // Proctoring active for Github Round
     const [submissionLink, setSubmissionLink] = useState(() => {
         return localStorage.getItem('github_submission_link') || '';
     });
@@ -277,7 +279,8 @@ const GithubRound = () => {
                                 <button
                                     onClick={handleSubmit}
                                     disabled={isSubmitting || !submissionLink}
-                                    className="flex items-center gap-4 px-12 py-4 rounded-2xl bg-gradient-to-r from-[#8a6e2e] to-[#d4af37] text-black font-wizard font-bold text-2xl hover:from-[#d4af37] hover:to-[#FFD700] shadow-[0_0_30px_rgba(212,175,55,0.3)] transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:scale-105 active:scale-95"
+                                    className="flex items-center gap-4 px-12 py-4 rounded-2xl bg-linear-to-r from-[#8a6e2e] to-[#d4af37] text-black font-wizard font-bold text-2xl hover:from-[#d4af37] hover:to-[#FFD700] shadow-[0_0_30px_rgba(212,175,55,0.3)] transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:scale-105 active:scale-95"
+
                                 >
                                     <span>{isSubmitting ? 'Casting Spell...' : 'Submit Solution'}</span>
                                     {isSubmitting ? <div className="animate-spin rounded-full h-5 w-5 border-3 border-black/20 border-t-black" /> : <Send size={20} />}

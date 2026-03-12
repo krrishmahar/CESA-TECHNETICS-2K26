@@ -13,9 +13,11 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/technetics-head.svg';
+import { useAntiCheat } from '../hooks/useAntiCheat';
 
 const HackathonSelection = () => {
     const navigate = useNavigate();
+    useAntiCheat("3"); 
     const [selectedId, setSelectedId] = useState<number | null>(null);
     const [showConfirm, setShowConfirm] = useState(false);
     const [isConfirmed, setIsConfirmed] = useState(false);
@@ -233,7 +235,8 @@ const HackathonSelection = () => {
                             <button
                                 onClick={() => selectedId && setShowConfirm(true)}
                                 disabled={!selectedId || isConfirmed}
-                                className="px-16 py-4 rounded-2xl bg-gradient-to-r from-[#8a6e2e] to-[#d4af37] text-black font-wizard text-2xl hover:from-[#d4af37] hover:to-[#FFD700] shadow-[0_0_30px_rgba(212,175,55,0.3)] transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:scale-105 active:scale-95 tracking-widest"
+                                className="px-16 py-4 rounded-2xl bg-linear-to-r from-[#8a6e2e] to-[#d4af37] text-black font-wizard text-2xl hover:from-[#d4af37] hover:to-[#FFD700] shadow-[0_0_30px_rgba(212,175,55,0.3)] transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:scale-105 active:scale-95 tracking-widest"
+
                             >
                                 {isConfirmed ? 'Quest Manifested' : 'Lock Selection'}
                             </button>

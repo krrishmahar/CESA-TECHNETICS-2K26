@@ -2,32 +2,35 @@ import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { API_BASE_URL } from "../api/auth";
+import { useGameStore } from "../store/useGameStore";
+import { supabase } from "../lib/supabase";
+import { RefreshCw, Sparkles } from "lucide-react";
+
 
 const WaitingListPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
-    const eventSlug = queryParams.get('event') || "the-order-of-obscure-code";
+    const eventSlugFromUrl = queryParams.get('event') || "the-order-of-obscure-code";
 
-    const [isAdmin, setIsAdmin] = useState(false);
+    const { user, role, setEventContext } = useGameStore();
+
+    const [eventSlug] = useState(eventSlugFromUrl);
+
     const [counts, setCounts] = useState({ total: 0, checkedIn: 0, waiting: 0 });
     const [error, setError] = useState<string | null>(null);
 
+
     useEffect(() => {
-        const adminData = localStorage.getItem("admin_data");
-        const participantDataStr = localStorage.getItem("participant_data");
-
-        if (adminData) setIsAdmin(true);
-
         // Check in participant
-        if (participantDataStr && !adminData) {
-            const participantData = JSON.parse(participantDataStr);
+        if (role === 'participant' && user?.registrationId) {
             fetch(`${API_BASE_URL}/auth/checkin`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ registrationId: participantData.registrationId })
+                body: JSON.stringify({ registrationId: user.registrationId })
             }).catch(console.error);
         }
+
 
         // Setup SSE for redirection (Listen for start events)
         const eventSource = new EventSource(`${API_BASE_URL}/admin/events/${eventSlug}/waiting-room/stream`);
@@ -42,16 +45,14 @@ const WaitingListPage = () => {
                 }
                 
                 if (data.broadcasted || data.type === 'START_GAME') {
-                    // Start event triggered
-                    if (data.redirectTo && data.redirectTo.includes("obscure-code")) {
-                        navigate("/aptitude-round");
-                    } else if (data.redirectTo && data.redirectTo.includes("dark-mark")) {
-                        navigate("/dark-mark-bounty");
-                    } else {
-                        // fallback based on slug
-                        navigate(eventSlug.includes("obscure") ? "/aptitude-round" : "/dark-mark-bounty");
-                    }
+                    const targetPath = data.redirectTo || (eventSlug.includes("obscure") ? "/aptitude-round" : "/dark-mark-bounty");
+                    
+                    // Update store session context before navigating
+                    setEventContext(eventSlug, data.roundId || null);
+                    
+                    navigate(targetPath);
                 }
+
             } catch (err) {
                 console.error("SSE parse error", err);
             }
@@ -61,9 +62,44 @@ const WaitingListPage = () => {
              // Fallback to polling or quiet failure
         };
 
-        // Fallback polling for admin counts if SSE doesn't broadcast counts immediately
+        // --- SUPABASE REALTIME INTEGRATION ---
+        let registrationSubscription: any = null;
+        if (supabase && user?.registrationId) {
+            registrationSubscription = supabase
+                .channel(`registration_${user.registrationId}`)
+                .on(
+                    'postgres_changes',
+                    {
+                        event: 'UPDATE',
+                        schema: 'public',
+                        table: 'event_registrations',
+                        filter: `id=eq.${user.registrationId}`
+                    },
+                    (payload) => {
+                        console.log('Registration update received:', payload);
+                        const { currentRound } = payload.new;
+                        if (currentRound) {
+                            const roundToPath: Record<number, string> = {
+                                1: "/aptitude-round",
+                                2: "/github-round",
+                                3: "/hackathon-selection",
+                                4: "/dark-mark-bounty"
+                            };
+                            const targetPath = roundToPath[currentRound as number];
+                            if (targetPath) {
+                                setEventContext(eventSlug, String(currentRound));
+                                navigate(targetPath);
+                            }
+                        }
+                    }
+                )
+                .subscribe();
+        }
+
+        // Fallback polling for admin counts
         let interval: ReturnType<typeof setInterval>;
-        if (adminData) {
+        if (role === 'admin') {
+
             const fetchCounts = async () => {
                 try {
                     const res = await fetch(`${API_BASE_URL}/admin/events/${eventSlug}/waiting-room`);
@@ -82,8 +118,12 @@ const WaitingListPage = () => {
         return () => {
             eventSource.close();
             if (interval) clearInterval(interval);
+            if (registrationSubscription) {
+                supabase?.removeChannel(registrationSubscription);
+            }
         };
-    }, [eventSlug, navigate]);
+    }, [eventSlug, navigate, role, user, setEventContext]);
+
 
     const handleStartGame = async () => {
         try {
@@ -99,6 +139,39 @@ const WaitingListPage = () => {
             setError(err.message);
         }
     };
+
+    const handleManualRefresh = async () => {
+        if (!user?.registrationId) return;
+        setIsLoadingStatus(true);
+        try {
+            // Check current registration status
+            const res = await fetch(`${API_BASE_URL}/participants/status/${user.registrationId}`);
+            if (res.ok) {
+                const data = await res.json();
+                if (data.currentRound) {
+                    const roundToPath: Record<number, string> = {
+                        1: "/aptitude-round",
+                        2: "/github-round",
+                        3: "/hackathon-selection",
+                        4: "/dark-mark-bounty"
+                    };
+                    const targetPath = roundToPath[data.currentRound];
+                    if (targetPath && location.pathname !== targetPath) {
+                        setEventContext(eventSlug, String(data.currentRound));
+                        navigate(targetPath);
+                        return;
+                    }
+                }
+                alert("The Arena state remains unchanged. Please wait for the Ministry's call.");
+            }
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setIsLoadingStatus(false);
+        }
+    };
+
+    const [isLoadingStatus, setIsLoadingStatus] = useState(false);
 
     return (
         <div className="min-h-screen bg-[#021516] flex flex-col items-center justify-center text-[#d4af37] p-4 relative overflow-hidden">
@@ -119,7 +192,8 @@ const WaitingListPage = () => {
                     Waiting List
                 </motion.h1>
 
-                {isAdmin ? (
+                {role === 'admin' ? (
+
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -167,13 +241,24 @@ const WaitingListPage = () => {
                             initial={{ opacity: 0, scale: 0.5 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: 0.6, duration: 0.8 }}
-                            className="flex justify-center mb-12"
+                            className="flex flex-col items-center gap-8 mb-12"
                         >
                             <div className="w-20 h-20 relative">
                                 <div className="absolute inset-0 border-4 border-[#d4af37]/20 rounded-full"></div>
                                 <div className="absolute inset-0 border-4 border-[#d4af37] border-t-transparent rounded-full animate-spin"></div>
                                 <div className="absolute inset-2 border-4 border-[#FFD700] border-b-transparent rounded-full animate-[spin_1.5s_linear_infinite_reverse]"></div>
                             </div>
+
+                            <button
+                                onClick={handleManualRefresh}
+                                disabled={isLoadingStatus}
+                                className="group relative px-8 py-3 bg-[#d4af37]/10 border border-[#d4af37]/40 rounded-full text-[#FFD700] font-wizard tracking-widest hover:bg-[#d4af37]/20 transition-all flex items-center gap-3 active:scale-95 disabled:opacity-50"
+                            >
+                                <Sparkles size={18} className={isLoadingStatus ? "animate-pulse" : "group-hover:rotate-12 transition-transform"} />
+                                <span>{isLoadingStatus ? "Gazing into Crystal Ball..." : "Magic Refresh"}</span>
+                                <RefreshCw size={14} className={isLoadingStatus ? "animate-spin" : "opacity-50"} />
+                                <div className="absolute inset-0 bg-[#d4af37]/5 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </button>
                         </motion.div>
                     </>
                 )}
