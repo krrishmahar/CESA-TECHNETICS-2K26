@@ -1,0 +1,556 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Special+Elite&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Cinzel+Decorative:wght@400;700&family=IM+Fell+English:ital@0;1&display=swap');
+
+@font-face {
+  font-family: 'BlackChancery';
+  src: url('/fonts/BLKCHCRY.woff2') format('woff2'),
+    url('/fonts/BLKCHCRY.woff') format('woff'),
+    url('/fonts/BLKCHCRY.TTF') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Harry P';
+  src: url('/fonts/HarryP.woff2') format('woff2'),
+    url('/fonts/HarryP.woff') format('woff'),
+    url('/fonts/HarryP.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* --- TECHNETICS CORE COLORS --- */
+    --background: 186 80% 4%; /* #010a0b approx */
+    --foreground: 0 0% 100%;
+
+    /* Cards & Surfaces */
+    --card: 186 60% 8%;
+    --card-foreground: 0 0% 95%;
+    --card-glass: 186 40% 10%;
+
+    /* Primary - Gold */
+    --primary: 45 100% 50%; /* #FFD700 */
+    --primary-foreground: 186 80% 5%;
+    --primary-glow: 45 100% 60%;
+
+    /* Secondary - Teal/Sea-foam */
+    --secondary: 174 72% 41%; /* #0d9488 */
+    --secondary-foreground: 0 0% 100%;
+    --secondary-glow: 174 80% 50%;
+
+    /* Border & Input */
+    --border: 186 40% 15%;
+    --input: 186 40% 12%;
+    --ring: 45 100% 50%;
+
+    --radius: 0.5rem;
+
+    /* Technetics Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(174 72% 41%), hsl(45 100% 50%));
+    --gradient-secondary: linear-gradient(135deg, hsl(45 100% 50%), hsl(174 72% 31%));
+    --gradient-dark: linear-gradient(180deg, hsl(186 80% 5%), hsl(0 0% 0%));
+    --gradient-glass: linear-gradient(135deg, hsla(186, 60%, 15%, 0.4), hsla(186, 40%, 8%, 0.2));
+
+    /* Shadows - Teal/Gold glows */
+    --shadow-glow-primary: 0 0 40px hsla(174, 72%, 41%, 0.4);
+    --shadow-glow-secondary: 0 0 40px hsla(45, 100%, 50%, 0.4);
+    --shadow-glass: 0 8px 32px hsla(186, 80% 5% / 0.6);
+    --shadow-flicker: 0 0 10px hsla(174, 80%, 50%, 0.8),
+      0 0 40px hsla(174, 80%, 50%, 0.4),
+      0 0 80px hsla(174, 80%, 50%, 0.2);
+
+    /* Sidebar */
+    --sidebar-background: 186 80% 3%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 45 100% 50%;
+    --sidebar-primary-foreground: 186 80% 5%;
+    --sidebar-accent: 186 40% 12%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 186 40% 15%;
+    --sidebar-ring: 45 100% 50%;
+  }
+
+  .dark {
+    --background: 186 80% 2%;
+    --foreground: 0 0% 95%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Manrope', sans-serif;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Cinzel Decorative', serif;
+    letter-spacing: 0.05em;
+  }
+
+  code, pre, .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .font-harry { font-family: 'Harry P', serif; }
+  .font-wizard { font-family: 'Cinzel Decorative', serif; }
+  .font-blackchancery { font-family: 'BlackChancery', serif; }
+  .font-cinzel { font-family: 'Cinzel Decorative', serif; }
+  .font-parchment { font-family: 'IM Fell English', serif; }
+  .font-script { font-family: 'Dancing Script', cursive; }
+  .font-crimson { font-family: 'Crimson Text', serif; }
+}
+
+
+/* Technetics Base Utilities */
+.ink-text {
+  color: #2c1e14;
+  text-shadow: 0.5px 0.5px 1px rgba(0,0,0,0.1);
+}
+
+/* Modified Glassmorphism for Teal/Gold theme */
+.glass {
+  @apply bg-card/60 backdrop-blur-xl border border-secondary/20;
+  box-shadow: 0 8px 32px hsla(186, 80%, 5%, 0.8);
+}
+
+.glass-strong {
+  @apply bg-card/80 backdrop-blur-2xl border border-primary/20;
+  box-shadow: 0 8px 32px hsla(186, 80%, 5%, 0.9);
+}
+
+  /* Technetics Specific Rounds Styling */
+  .scroll-top {
+    width: 100%;
+    height: 80px;
+    background-image: url("data:image/png;base64,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");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+  }
+
+  .scroll-bottom {
+    width: 100%;
+    height: 80px;
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAXEAAAIdCAYAAADLWU0YAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAP+lSURBVHhe7P15vG1LVhUIjxmx1t77NLd9fZLNS0hTyISyVEA0pRQBQSg/PzVBKUA+sSvApqqQpBNEKRAFaf0AtSwBRVH8CVgqaoFKlVWQIkpaSCONkpBJti9fc+89Z++1Vsz6Y4wZEXufc1++l+TLJ/xu3LvOXk2saGeMOWPOGbHs2rVrjnvhXrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXzrhHojfC/fCvXAv/BIO90D8XrgX7oV74V64F+6FXxWv9u6v6n/mF8pP9vIu/Oiv7L9H/w07uX+S91/u/Z/97eH9L77//+fE0N/p0evv9X53CvfCvfBeC+/2L6H6C1H0/vH++6/fP9X7/u79U07unUAn/+X/F7r/6763A7pWCPfCvfBeC08rOnv+X+p8X59I94rX039X6P497v7647uM7pWhm/9S7y+4uU++W3hXv6XfHdrT7uH9Xz9X7e9/f8ndu/8O0W999+9C/m67n/8P/fL9/v+nO6S799O9e+77/n8MvQy4V00vD71U6A8vI8+AeyF9R99vCHf8hP8X0qOnD/2z3f2t3u9K+vG/dfjVPy70O79v++99N/SnoW89/fH/KXRfMvT3/pD+TvcD/mLoZf9u6M/r6J7Y/O/6rV+9P7z//un/E+nZ7k89rU899NL76Y5v/27on//p78Y9u/v8/w5p3f+f6f/P/E/Vv0L9O7v2f8L+bv77/77oP8vR9H7P+v8X/T/fUH66Anv8X759+GkDyH+p9D9O0j/67zU/uGkjyD990i/+n/S9yT9+Psq6ce/78e/6D238CPffwr8T9OfA//Tof/peSndL9X/Mfp/kP7P+n+O/u9Of6K+9T097XvS77nvCff0tKT7nu7rvaenJd3S7/37+i7h/l699/S0u/f0XfO7X39Kuv+Of5Keeun+P/i7uvf0t9A9ve/v9O7p/vH/e7rnfvx9fEfdB96P0P3rXm8S/u97eN77vYe7v2t599//E9LX+7+X/p+l99/57z/4Iu++9L/+4Av8r7z/+y/y8ovv/v5L6f73v/38H9BPPf/+g9eSPlz/yL8fMfn57uH6R/42uP+Rf7//W6S/f7//H9C95N/vP/Xv9//of/9N6P79f0f67ve/7T29/08v8W7of+2Bf//V5Pv/7f3vUu8D7+X/K/Tei/vT/S+F/58v0l1yX7p3uXdD6P6lD+fL6X7F+v9H+O8R/nvF++8Rf9XmP9A/P/9vP/9Xf/y7/8Xv/vL/IeT/v/j/B/pY7H9P5nBvAAA=");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+  }
+
+  .scroll-content {
+    width: 95%;
+    background-color: #e8d0a0;
+    background-image: url("https://www.transparenttextures.com/patterns/parchment.png");
+    box-shadow: inset 0 0 50px rgba(0,0,0,0.2);
+    position: relative;
+    z-index: 10;
+    margin: -5px 0;
+    padding: 40px 10%;
+    min-height: 300px;
+  }
+
+  /* Custom Selection Gold */
+  ::selection {
+    background: #FFD700;
+    color: #000;
+  }
+
+
+@layer base {
+  body {
+    background-color: #021516;
+    color: white;
+  }
+}
+
+  /* Gradient Text */
+  .gradient-text {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-primary);
+  }
+
+  .gradient-text-secondary {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-secondary);
+  }
+
+  /* Stranger Things Grid Background */
+  .grid-bg {
+    background-image:
+      linear-gradient(hsla(0, 85%, 50%, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, hsla(0, 85%, 50%, 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  /* Upside Down Grid */
+  .grid-upside-down {
+    background-image:
+      linear-gradient(hsla(200, 80%, 50%, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, hsla(200, 80%, 50%, 0.05) 1px, transparent 1px);
+    background-size: 30px 30px;
+    transform: perspective(500px) rotateX(60deg);
+    transform-origin: center top;
+  }
+
+  /* Animated Border with flicker */
+  .border-gradient {
+    position: relative;
+    background: linear-gradient(hsl(var(--card)), hsl(var(--card))) padding-box,
+      var(--gradient-primary) border-box;
+    border: 1px solid transparent;
+  }
+
+  /* Flicker Animation */
+  @keyframes flicker {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    5% {
+      opacity: 0.8;
+    }
+    10% {
+      opacity: 1;
+    }
+    15% {
+      opacity: 0.9;
+    }
+    20% {
+      opacity: 1;
+    }
+    55% {
+      opacity: 1;
+    }
+    57% {
+      opacity: 0.7;
+    }
+    60% {
+      opacity: 1;
+    }
+    80% {
+      opacity: 1;
+    }
+    82% {
+      opacity: 0.85;
+    }
+    85% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes flicker-text {
+    0%,
+    100% {
+      opacity: 1;
+      text-shadow: 0 0 10px hsl(var(--primary)), 0 0 30px hsl(var(--primary) / 0.5), 0 0 60px hsl(var(--primary) / 0.3);
+    }
+    5%,
+    57%,
+    82% {
+      opacity: 0.8;
+      text-shadow: 0 0 5px hsl(var(--primary)), 0 0 15px hsl(var(--primary) / 0.3);
+    }
+  }
+
+  .flicker-text {
+    animation: flicker-text 4s infinite;
+  }
+
+  /* VHS/CRT Effect */
+  @keyframes vhs-glitch {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    10% {
+      transform: translateX(-2px);
+    }
+    20% {
+      transform: translateX(2px);
+    }
+    30% {
+      transform: translateX(0);
+    }
+  }
+
+  .vhs-effect {
+    animation: vhs-glitch 0.3s infinite;
+  }
+
+  /* Pulse Animation */
+  .pulse-glow {
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+
+  @keyframes pulseGlow {
+    0%,
+    100% {
+      box-shadow: 0 0 20px hsla(0, 85%, 50%, 0.3);
+    }
+    50% {
+      box-shadow: 0 0 50px hsla(0, 85%, 50%, 0.6);
+    }
+  }
+
+  /* Stranger Things Scanlines */
+  .scanlines {
+    position: relative;
+  }
+
+  .scanlines::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg,
+        transparent,
+        transparent 2px,
+        hsla(0, 0%, 0%, 0.1) 2px,
+        hsla(0, 0%, 0%, 0.1) 4px);
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  /* CRT Screen Effect */
+  .crt-effect {
+    position: relative;
+  }
+
+  .crt-effect::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center,
+        transparent 0%,
+        transparent 70%,
+        hsla(0, 0%, 0%, 0.4) 100%);
+    pointer-events: none;
+  }
+
+  /* Stranger Things Particles */
+  .particles {
+    background-image:
+      radial-gradient(1px 1px at 20px 30px, hsl(var(--primary) / 0.4), transparent),
+      radial-gradient(1px 1px at 40px 70px, hsl(var(--secondary) / 0.3), transparent),
+      radial-gradient(1px 1px at 50px 160px, hsl(var(--primary) / 0.3), transparent),
+      radial-gradient(1px 1px at 90px 40px, hsl(var(--secondary) / 0.4), transparent),
+      radial-gradient(1px 1px at 130px 80px, hsl(var(--primary) / 0.2), transparent),
+      radial-gradient(1.5px 1.5px at 160px 120px, hsl(var(--primary) / 0.5), transparent);
+    background-repeat: repeat;
+    background-size: 200px 200px;
+    animation: particle-drift 20s linear infinite;
+  }
+
+  @keyframes particle-drift {
+    0% {
+      background-position: 0 0;
+    }
+    100% {
+      background-position: 200px 200px;
+    }
+  }
+
+  /* Status Badges */
+  .status-active {
+    @apply bg-success/20 text-success border border-success/30;
+  }
+
+  .status-pending {
+    @apply bg-warning/20 text-warning border border-warning/30;
+  }
+
+  .status-locked {
+    @apply bg-muted text-muted-foreground border border-border;
+  }
+
+  .status-error {
+    @apply bg-destructive/20 text-destructive border border-destructive/30;
+  }
+
+  /* Upside Down Portal */
+  .portal-effect {
+    background: radial-gradient(ellipse at center,
+        hsla(200, 80%, 30%, 0.3) 0%,
+        hsla(0, 85%, 30%, 0.2) 30%,
+        transparent 70%);
+    animation: portal-pulse 4s ease-in-out infinite;
+  }
+
+  @keyframes portal-pulse {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 0.5;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 0.8;
+    }
+  }
+
+  /* Code Editor Styling */
+  .monaco-editor {
+    border-radius: var(--radius);
+  }
+
+  /* Scrollbar - Red theme */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-background;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary/30 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary/50;
+  }
+
+  /* Selection - Red */
+  ::selection {
+    @apply bg-primary/40 text-foreground;
+  }
+
+  /* 80s Neon Border */
+  .neon-border {
+    border: 2px solid hsl(var(--primary));
+    box-shadow:
+      inset 0 0 10px hsla(0, 85%, 50%, 0.3),
+      0 0 10px hsla(0, 85%, 50%, 0.3),
+      0 0 20px hsla(0, 85%, 50%, 0.2);
+  }
+
+  /* Stranger Things Button Hover */
+  .stranger-btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .stranger-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+        transparent,
+        hsla(0, 85%, 50%, 0.4),
+        transparent);
+    transition: left 0.5s ease;
+  }
+
+  .stranger-btn:hover::before {
+    left: 100%;
+  }
+
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Retro text styles */
+  .retro-shadow {
+    text-shadow:
+      3px 3px 0 hsl(var(--primary) / 0.3),
+      6px 6px 0 hsl(var(--primary) / 0.1);
+  }
+
+  /* --- NEW STRANGER THINGS HERO UTILITIES --- */
+
+  /* 1. FONT FIX: Merriweather ko stretch karke Benguiat jaisa banaya */
+  .font-st {
+    font-family: 'Merriweather', serif;
+    transform: scaleY(1.35); /* Makes font tall */
+    display: inline-block;
+  }
+
+  /* 2. GLOW FIX: Hollow text with Neon Stroke */
+  .st-glow {
+    color: #000; /* Text ke andar Black */
+    -webkit-text-stroke: 2.5px var(--st-red); /* Thick Neon Red Border */
+
+    /* Layered Glow for Depth - Fixed Spacing Here */
+    text-shadow:
+      0 0 5px rgba(255, 31, 31, 0.9),
+      0 0 20px rgba(255, 31, 31, 0.6),
+      0 0 50px rgba(160, 0, 0, 0.8);
+  }
+
+  /* Red Bar Glow (Kept for compatibility) */
+  .st-bar-glow {
+    background-color: #ff1f1f;
+    box-shadow: 0 0 10px #ff1f1f, 0 0 40px rgba(255, 31, 31, 0.6);
+  }
+
+  /* Tldraw Canvas Optimizations */
+  .tldraw-custom-wrapper {
+    /* Performance optimizations */
+    will-change: transform;
+    contain: layout style paint;
+  }
+
+  /* Better scrollbar for requirements panel */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: hsl(0 5% 15%);
+    border-radius: 3px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: hsl(0 5% 30%);
+    border-radius: 3px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: hsl(0 5% 40%);
+  }
+
+
+/* Tldraw UI Customization - Better spacing and visibility */
+.tldraw {
+  --color-background: #0a0a0a !important;
+  --color-panel: rgb(24 24 27) !important;
+}
+
+/* Tldraw toolbar positioning - prevent overlap */
+.tlui-layout__top {
+  padding-top: 8px !important;
+}
+
+.tlui-toolbar {
+  margin-left: 8px !important;
+}
+
+/* Better contrast for tldraw UI */
+.tlui-button {
+  border-radius: 6px !important;
+}
+
+/* Smoother rendering */
+.tl-canvas {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+}
